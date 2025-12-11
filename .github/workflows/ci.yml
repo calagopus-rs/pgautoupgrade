@@ -147,6 +147,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
+      # otherwise, we run into space problems
+      # from observation, the buildx builder container already occupies 7 GB out of the 14 GB we have available on a GitHub Actions runner
+      # note that this command will also destroy the pgautoupgrade image we just build
+      # which is intentional, the buildx builder should contain all information still to re-create the same image
+      - name: Cleanup Docker image before pushing
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker image prune -a -f
+
       - name: Push image
         if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v6
