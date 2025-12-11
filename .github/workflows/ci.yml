@@ -13,7 +13,7 @@ env:
 jobs:
   base-images:
     # for security reason, we only build these images in our repository and on the main branch
-    if: github.repository == 'pgautoupgrade/docker-pgautoupgrade' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-22.04
     strategy:
       matrix:
@@ -112,7 +112,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-        if: github.repository == 'pgautoupgrade/docker-pgautoupgrade' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
@@ -162,12 +162,12 @@ jobs:
       # note that this command will also destroy the pgautoupgrade image we just build
       # which is intentional, the buildx builder should contain all information still to re-create the same image
       - name: Cleanup Docker image before pushing
-        if: github.repository == 'pgautoupgrade/docker-pgautoupgrade' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         run: |
           docker image prune -a -f
 
       - name: Push image
-        if: github.repository == 'pgautoupgrade/docker-pgautoupgrade' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v6
         with:
           file: "Dockerfile.${{ matrix.operating_system.flavor }}"
@@ -181,7 +181,7 @@ jobs:
           cache-from: "${{ env.CACHE_FROM }}"
 
       - name: Push latest image for each supported OS
-        if: github.repository == 'pgautoupgrade/docker-pgautoupgrade' && github.ref == 'refs/heads/main' && matrix.pg_target.PG_VERSION == env.LATEST_POSTGRES_VERSION
+        if: github.ref == 'refs/heads/main' && matrix.pg_target.PG_VERSION == env.LATEST_POSTGRES_VERSION
         uses: docker/build-push-action@v6
         with:
           file: "Dockerfile.${{ matrix.operating_system.flavor }}"
@@ -196,7 +196,7 @@ jobs:
           cache-from: "${{ env.CACHE_FROM }}"
 
       - name: Push general latest image
-        if: github.repository == 'pgautoupgrade/docker-pgautoupgrade' && github.ref == 'refs/heads/main' && matrix.pg_target.PG_VERSION == env.LATEST_POSTGRES_VERSION && matrix.operating_system.flavor == 'alpine'
+        if: github.ref == 'refs/heads/main' && matrix.pg_target.PG_VERSION == env.LATEST_POSTGRES_VERSION && matrix.operating_system.flavor == 'alpine'
         uses: docker/build-push-action@v6
         with:
           file: "Dockerfile.${{ matrix.operating_system.flavor }}"
