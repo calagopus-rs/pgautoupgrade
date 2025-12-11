@@ -7,15 +7,6 @@ ARG ALPINE_VERSION=3.22
 ### Things we need in all build containers
 FROM alpine:${ALPINE_VERSION} AS base-build
 
-# The versions of PostgreSQL to use
-ENV PG95=9.5.25
-ENV PG96=9.6.24
-ENV PG10=10.23
-ENV PG11=11.22
-
-# renovate: datasource=repology depName=homebrew/postgresql@12 versioning=loose
-ENV PG12_VERSION=12.22
-
 # renovate: datasource=repology depName=homebrew/postgresql@13 versioning=loose
 ENV PG13_VERSION=13.23
 
@@ -44,63 +35,6 @@ WORKDIR ${BUILD_ROOT}
 RUN apk update && \
   apk add --update build-base icu-data-full icu-dev linux-headers lz4-dev musl musl-locales musl-utils tzdata zlib-dev zstd-dev && \
   apk cache clean
-
-### PostgreSQL 9.5
-FROM base-build AS build-9.5
-
-RUN wget https://ftp.postgresql.org/pub/source/v${PG95}/postgresql-${PG95}.tar.bz2 && \
-  tar -xf postgresql-9.5*.tar.bz2
-
-RUN cd postgresql-9.5.* && \
-  ./configure --prefix=/usr/local-pg9.5 --with-openssl=no --without-readline --with-system-tzdata=/usr/share/zoneinfo --enable-debug=no CFLAGS="-Os" && \
-  make -j $(nproc) world && \
-  make install-world && \
-  rm -rf /usr/local-pg9.5/include
-
-### PostgreSQL 9.6
-FROM base-build AS build-9.6
-
-RUN wget https://ftp.postgresql.org/pub/source/v${PG96}/postgresql-${PG96}.tar.bz2 && \
-  tar -xf postgresql-9.6*.tar.bz2
-
-RUN cd postgresql-9.6.* && \
-  ./configure --prefix=/usr/local-pg9.6 --with-openssl=no --without-readline --with-system-tzdata=/usr/share/zoneinfo --enable-debug=no CFLAGS="-Os" && \
-  make -j $(nproc) world-bin && \
-  make install-world-bin && \
-  rm -rf /usr/local-pg9.6/include
-
-### PostgreSQL 10
-FROM base-build AS build-10
-RUN wget https://ftp.postgresql.org/pub/source/v${PG10}/postgresql-${PG10}.tar.bz2 && \
-  tar -xf postgresql-10*.tar.bz2
-
-RUN cd postgresql-10.* && \
-  ./configure --prefix=/usr/local-pg10 --with-openssl=no --without-readline --with-icu --with-system-tzdata=/usr/share/zoneinfo --enable-debug=no CFLAGS="-Os" && \
-  make -j $(nproc) world-bin && \
-  make install-world-bin && \
-  rm -rf /usr/local-pg10/include
-
-### PostgreSQL 11
-FROM base-build AS build-11
-RUN wget https://ftp.postgresql.org/pub/source/v${PG11}/postgresql-${PG11}.tar.bz2 && \
-  tar -xf postgresql-11*.tar.bz2
-
-RUN cd postgresql-11.* && \
-  ./configure --prefix=/usr/local-pg11 --with-openssl=no --without-readline --with-icu --with-system-tzdata=/usr/share/zoneinfo --enable-debug=no CFLAGS="-Os" && \
-  make -j $(nproc) world-bin && \
-  make install-world-bin && \
-  rm -rf /usr/local-pg11/include
-
-### PostgreSQL 12
-FROM base-build AS build-12
-RUN wget https://ftp.postgresql.org/pub/source/v${PG12_VERSION}/postgresql-${PG12_VERSION}.tar.bz2 && \
-  tar -xf postgresql-12*.tar.bz2
-
-RUN cd postgresql-12.* && \
-  ./configure --prefix=/usr/local-pg12 --with-openssl=no --without-readline --with-icu --with-system-tzdata=/usr/share/zoneinfo --enable-debug=no CFLAGS="-Os" && \
-  make -j $(nproc) world-bin && \
-  make install-world-bin && \
-  rm -rf /usr/local-pg12/include
 
 ### PostgreSQL 13
 FROM base-build AS build-13
@@ -177,11 +111,6 @@ COPY --chown=999 postgresql.conf pg_hba.conf /opt/pgautoupgrade/
 ARG PGTARGET
 
 # Copy across our compiled files
-COPY --from=build-9.5 /usr/local-pg9.5 /usr/local-pg9.5
-COPY --from=build-9.6 /usr/local-pg9.6 /usr/local-pg9.6
-COPY --from=build-10 /usr/local-pg10 /usr/local-pg10
-COPY --from=build-11 /usr/local-pg11 /usr/local-pg11
-COPY --from=build-12 /usr/local-pg12 /usr/local-pg12
 COPY --from=build-13 /usr/local-pg13 /usr/local-pg13
 COPY --from=build-14 /usr/local-pg14 /usr/local-pg14
 COPY --from=build-15 /usr/local-pg15 /usr/local-pg15
