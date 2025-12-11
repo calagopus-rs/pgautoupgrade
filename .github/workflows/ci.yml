@@ -132,29 +132,8 @@ jobs:
             type=semver,pattern={{major}},value=${{ matrix.pg_target.PG_VERSION }}.0,suffix=-${{ matrix.operating_system.alias }}
             type=semver,pattern={{major}}.{{minor}},value=${{ matrix.pg_target.PG_VERSION }}.0,suffix=-${{ matrix.operating_system.alias }}
 
-      - name: Build image
-        uses: docker/build-push-action@v6
-        with:
-          file: "Dockerfile.${{ matrix.operating_system.flavor }}"
-          load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            "PGTARGET=${{ matrix.pg_target.PG_VERSION }}"
-          cache-to: type=inline
-          cache-from: "${{ env.CACHE_FROM }}"
-
       - name: Checkout code
         uses: actions/checkout@v6
-
-      # otherwise, we run into space problems
-      # from observation, the buildx builder container already occupies 7 GB out of the 14 GB we have available on a GitHub Actions runner
-      # note that this command will also destroy the pgautoupgrade image we just build
-      # which is intentional, the buildx builder should contain all information still to re-create the same image
-      - name: Cleanup Docker image before pushing
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker image prune -a -f
 
       - name: Push image
         if: github.ref == 'refs/heads/main'
