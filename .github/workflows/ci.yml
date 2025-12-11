@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: base-images
     # otherwise, it would skip the build entirely (because the base step does not run)
-    if: false
+    if: always()
     env:
       # but still use our public caches in any case
       # they might be outdated, in which case a full rebuild will be triggered
@@ -147,22 +147,6 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v6
-
-      - name: Test image
-        run: |
-          make test
-        env:
-          PGTARGET: ${{ matrix.pg_target.PG_VERSION }}
-          OS_FLAVOR: ${{ matrix.operating_system.flavor }}
-
-      # otherwise, we run into space problems
-      # from observation, the buildx builder container already occupies 7 GB out of the 14 GB we have available on a GitHub Actions runner
-      # note that this command will also destroy the pgautoupgrade image we just build
-      # which is intentional, the buildx builder should contain all information still to re-create the same image
-      - name: Cleanup Docker image before pushing
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker image prune -a -f
 
       - name: Push image
         if: github.ref == 'refs/heads/main'
