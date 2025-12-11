@@ -50,7 +50,7 @@ jobs:
         with:
           file: "Dockerfile.${{ matrix.flavor }}"
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x
           build-args: |
             "PGTARGET=${{ env.LATEST_POSTGRES_VERSION }}"
           target: "build-${{ matrix.pg_version }}"
@@ -171,7 +171,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           file: "Dockerfile.${{ matrix.operating_system.flavor }}"
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
@@ -185,7 +185,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           file: "Dockerfile.${{ matrix.operating_system.flavor }}"
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x
           tags: |
             "pgautoupgrade/pgautoupgrade:${{ matrix.operating_system.flavor }}"
             "pgautoupgrade/pgautoupgrade:${{ matrix.operating_system.alias }}"
@@ -200,7 +200,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           file: "Dockerfile.${{ matrix.operating_system.flavor }}"
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/riscv64,linux/ppc64le,linux/s390x
           tags: |
             "pgautoupgrade/pgautoupgrade:latest"
           build-args: |
