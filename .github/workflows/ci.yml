@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: base-images
     # otherwise, it would skip the build entirely (because the base step does not run)
-    if: always()
+    if: false
     env:
       # but still use our public caches in any case
       # they might be outdated, in which case a full rebuild will be triggered
