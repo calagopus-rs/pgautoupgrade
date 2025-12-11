@@ -24,11 +24,6 @@ jobs:
           - alpine
           - trixie
         pg_version:
-          - "9.5"
-          - "9.6"
-          - "10"
-          - "11"
-          - "12"
           - "13"
           - "14"
           - "15"
@@ -71,11 +66,6 @@ jobs:
       # but still use our public caches in any case
       # they might be outdated, in which case a full rebuild will be triggered
       CACHE_FROM: |
-        type=registry,ref=pgautoupgrade/pgautoupgrade:build-9.5-${{ matrix.operating_system.flavor }}
-        type=registry,ref=pgautoupgrade/pgautoupgrade:build-9.6-${{ matrix.operating_system.flavor }}
-        type=registry,ref=pgautoupgrade/pgautoupgrade:build-10-${{ matrix.operating_system.flavor }}
-        type=registry,ref=pgautoupgrade/pgautoupgrade:build-11-${{ matrix.operating_system.flavor }}
-        type=registry,ref=pgautoupgrade/pgautoupgrade:build-12-${{ matrix.operating_system.flavor }}
         type=registry,ref=pgautoupgrade/pgautoupgrade:build-13-${{ matrix.operating_system.flavor }}
         type=registry,ref=pgautoupgrade/pgautoupgrade:build-14-${{ matrix.operating_system.flavor }}
         type=registry,ref=pgautoupgrade/pgautoupgrade:build-15-${{ matrix.operating_system.flavor }}
